@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Rotina</title>
+<meta name="description" content="Diário pessoal de movimento, sono, energia e alimentação.">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Rotina">
+<meta name="theme-color" content="#F7F1E6" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#14201A" media="(prefers-color-scheme: dark)">
+<meta name="format-detection" content="telephone=no">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="assets/icons/favicon.png">
+<link rel="preload" href="assets/fonts/fraunces-latin-full-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/fonts/outfit-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+<div class="status-veil" aria-hidden="true"></div>
+
+<div id="app">
+
+  <!-- shared day header (Hoje + Sono) -->
+  <header class="dayhead" id="dayhead">
+    <div class="dayhead-top">
+      <span class="greet" id="greet">rotina</span>
+      <button type="button" class="sync-pill" id="syncPill" aria-live="polite"><i></i><span>salvo</span></button>
+      <button type="button" class="icon-btn" id="openSettings" aria-label="Ajustes">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2.2"/><circle cx="9" cy="17" r="2.2"/></svg>
+      </button>
+    </div>
+    <h1 class="dayname" id="dayName">—</h1>
+    <div class="daydate"><span id="dayDate">—</span><button type="button" class="back-today" id="backToday" hidden>voltar pra hoje →</button></div>
+    <div class="week" id="weekStrip" role="tablist" aria-label="Dias da semana"></div>
+  </header>
+
+  <main>
+    <!-- ============ HOJE ============ -->
+    <section class="panel" id="panel-hoje" aria-label="Hoje">
+
+      <div class="note" id="planNote">
+        <span class="tape" aria-hidden="true"></span>
+        <div class="note-label" id="planLabel">plano de hoje</div>
+        <div class="note-title" id="planTitle"></div>
+        <div class="note-detail" id="planDetail"></div>
+      </div>
+
+      <section class="block">
+        <div class="block-head">
+          <img src="assets/art/dumbbell.png" alt="" class="art art-dumbbell">
+          <h2>movimento</h2>
+        </div>
+        <div id="actGroups"></div>
+        <form class="add-act" id="addActForm" autocomplete="off">
+          <input type="text" id="customLabel" placeholder="outra atividade…" enterkeyhint="done">
+          <select id="customCat" aria-label="Categoria"></select>
+          <button type="submit" aria-label="Adicionar">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+          </button>
+        </form>
+        <input type="text" class="line-input" id="movNote" placeholder="como foi? ex: 45 min, pernas cansadas…" enterkeyhint="done">
+      </section>
+
+      <div class="rule" aria-hidden="true"></div>
+
+      <section class="block">
+        <div class="block-head">
+          <img src="assets/art/sun.png" alt="" class="art art-sun">
+          <h2>energia</h2>
+          <span class="block-aside" id="energyWord"></span>
+        </div>
+        <div class="suns" id="suns" role="radiogroup" aria-label="Energia de 1 a 5"></div>
+        <div class="scale-labels"><span>zerada</span><span>a mil</span></div>
+      </section>
+
+      <div class="rule" aria-hidden="true"></div>
+
+      <section class="block">
+        <div class="block-head">
+          <img src="assets/art/apple.png" alt="" class="art art-apple">
+          <h2>comida</h2>
+        </div>
+        <div class="food" id="food" role="radiogroup" aria-label="Alimentação"></div>
+        <input type="file" id="fileInput" accept="image/*,application/pdf" multiple hidden>
+        <div class="polaroids" id="attachments"></div>
+      </section>
+
+      <p class="autosave-note"><img src="assets/art/heart.png" alt="" width="16" height="16"> tudo salva sozinho</p>
+    </section>
+
+    <!-- ============ DIÁRIO ============ -->
+    <section class="panel" id="panel-diario" aria-label="Diário">
+      <header class="page-head">
+        <h1>diário</h1>
+        <p id="diarioSub">como a semana está indo</p>
+      </header>
+
+      <section class="block">
+        <div class="block-head"><h2>esta semana</h2><span class="block-aside" id="weekRange"></span></div>
+        <div id="weekTally"></div>
+      </section>
+
+      <div class="rule" aria-hidden="true"></div>
+
+      <section class="block">
+        <div class="block-head">
+          <h2 id="calTitle">mês</h2>
+          <div class="cal-nav">
+            <button type="button" class="icon-btn" id="calPrev" aria-label="Mês anterior"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
+            <button type="button" class="icon-btn" id="calNext" aria-label="Próximo mês"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button>
+          </div>
+        </div>
+        <div class="cal" id="cal"></div>
+        <div class="legend" id="calLegend"></div>
+      </section>
+
+      <div class="rule" aria-hidden="true"></div>
+
+      <section class="block">
+        <div class="block-head"><h2>sono &amp; energia</h2><span class="block-aside">últimos 14 dias</span></div>
+        <div class="minichart" id="sleepChart"></div>
+        <div class="minichart" id="energyChart"></div>
+      </section>
+
+      <div class="rule" aria-hidden="true"></div>
+
+      <section class="block">
+        <div class="block-head"><h2>últimos dias</h2></div>
+        <div id="recentList"></div>
+      </section>
+    </section>
+
+    <!-- ============ SONO ============ -->
+    <section class="panel" id="panel-sono" aria-label="Sono">
+      <section class="block">
+        <div class="block-head">
+          <img src="assets/art/moon.png" alt="" class="art art-moon">
+          <h2>noite passada</h2>
+          <span class="block-aside" id="nightLabel"></span>
+        </div>
+        <div class="tickets">
+          <label class="ticket">
+            <span class="ticket-label">dormi</span>
+            <input type="time" id="sleepTime">
+          </label>
+          <span class="ticket-arrow" aria-hidden="true">→</span>
+          <label class="ticket">
+            <span class="ticket-label">acordei</span>
+            <input type="time" id="wakeTime">
+          </label>
+        </div>
+        <div class="sleep-result" id="sleepResult"></div>
+      </section>
+
+      <div class="rule" aria-hidden="true"></div>
+
+      <section class="block">
+        <div class="block-head"><h2>hoje à noite</h2></div>
+        <label class="field">
+          <span>primeiro compromisso de amanhã</span>
+          <input type="time" id="commitTime">
+        </label>
+        <div class="field"><span>quanto quero dormir</span>
+          <div class="seg" id="durSeg" role="radiogroup" aria-label="Duração do sono"></div>
+        </div>
+        <div class="bedtime" id="bedtime" hidden>
+          <div class="bedtime-row"><span>desligar as telas</span><strong id="screensOff">—</strong></div>
+          <div class="bedtime-row big"><span>deitar</span><strong id="bedAt">—</strong></div>
+        </div>
+        <p class="aside-note">Quanto mais cedo o compromisso de amanhã, mais cedo deitar hoje. Sem horário fixo — decide dia a dia.</p>
+        <a class="ghost-btn" href="https://www.calm.com" target="_blank" rel="noopener">abrir o Calm pra desligar</a>
+      </section>
+    </section>
+
+    <!-- ============ AJUSTES ============ -->
+    <section class="panel" id="panel-ajustes" aria-label="Ajustes">
+      <header class="page-head">
+        <button type="button" class="back-link" id="closeSettings">← voltar</button>
+        <h1>ajustes</h1>
+        <p>Seu plano e suas atividades ficam só no seu celular e na sua planilha.</p>
+      </header>
+
+      <section class="block">
+        <div class="block-head"><h2>você</h2></div>
+        <label class="field"><span>como te chamo</span><input type="text" id="cfgName" placeholder="seu nome" autocomplete="given-name"></label>
+      </section>
+
+      <div class="rule" aria-hidden="true"></div>
+
+      <section class="block">
+        <div class="block-head"><h2>plano da semana</h2></div>
+        <p class="aside-note">Aparece como lembrete no topo do dia. Não limita nada — você pode marcar qualquer atividade.</p>
+        <div id="cfgPlan"></div>
+      </section>
+
+      <div class="rule" aria-hidden="true"></div>
+
+      <section class="block">
+        <div class="block-head"><h2>atividades &amp; metas</h2></div>
+        <div id="cfgCats"></div>
+      </section>
+
+      <div class="rule" aria-hidden="true"></div>
+
+      <section class="block">
+        <div class="block-head"><h2>planilha google</h2></div>
+        <p class="aside-note">Conecta o app à sua planilha pra ter backup automático e pra o Claude poder ler seus dados. Passo a passo no README do projeto.</p>
+        <label class="field"><span>link do script (termina em /exec)</span><input type="url" id="syncUrl" placeholder="https://script.google.com/macros/s/…/exec" autocapitalize="off" autocorrect="off" spellcheck="false"></label>
+        <label class="field"><span>código secreto</span><input type="password" id="syncToken" autocapitalize="off" autocorrect="off" spellcheck="false"></label>
+        <div class="btn-row">
+          <button type="button" class="solid-btn" id="syncConnect">conectar</button>
+          <button type="button" class="ghost-btn" id="syncPull">baixar da planilha</button>
+        </div>
+        <p class="sync-detail" id="syncDetail"></p>
+      </section>
+
+      <div class="rule" aria-hidden="true"></div>
+
+      <section class="block">
+        <div class="block-head"><h2>backup</h2></div>
+        <p class="aside-note" id="backupNote">Um arquivo com tudo (dias, plano e anexos). Salve no iCloud Drive pelo menu de compartilhar.</p>
+        <div class="btn-row">
+          <button type="button" class="solid-btn" id="exportBtn">exportar backup</button>
+          <button type="button" class="ghost-btn" id="importBtn">importar</button>
+        </div>
+        <input type="file" id="importInput" accept="application/json,.json" hidden>
+        <details class="paste">
+          <summary>colar configuração</summary>
+          <textarea id="pasteCfg" rows="5" placeholder='{"plan": …, "categories": …}' spellcheck="false"></textarea>
+          <button type="button" class="ghost-btn" id="pasteCfgBtn">aplicar</button>
+        </details>
+      </section>
+
+      <div class="rule" aria-hidden="true"></div>
+
+      <section class="block">
+        <div class="block-head"><h2>aparência</h2></div>
+        <div class="seg" id="themeSeg" role="radiogroup" aria-label="Tema">
+          <button type="button" data-v="auto">automático</button>
+          <button type="button" data-v="light">claro</button>
+          <button type="button" data-v="dark">escuro</button>
+        </div>
+        <p class="version" id="version"></p>
+      </section>
+    </section>
+  </main>
+
+  <nav class="tabbar" id="tabbar">
+    <button type="button" class="tab" data-panel="hoje">
+      <svg viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="5"/><path d="M14 3.5v3M14 21.5v3M3.5 14h3M21.5 14h3M6.6 6.6l2 2M19.4 19.4l2 2M6.6 21.4l2-2M19.4 8.6l2-2"/></svg>
+      <span>hoje</span>
+    </button>
+    <button type="button" class="tab" data-panel="diario">
+      <svg viewBox="0 0 28 28" aria-hidden="true"><path d="M7 4.5h13a1.5 1.5 0 0 1 1.5 1.5v16A1.5 1.5 0 0 1 20 23.5H7z"/><path d="M7 4.5v19M11 10h6.5M11 14h5"/></svg>
+      <span>diário</span>
+    </button>
+    <button type="button" class="tab" data-panel="sono">
+      <svg viewBox="0 0 28 28" aria-hidden="true"><path d="M20.5 17.5A8.5 8.5 0 0 1 10.5 6a8.5 8.5 0 1 0 10 11.5z"/><path d="M18 5h3.5L18 9h3.5"/></svg>
+      <span>sono</span>
+    </button>
+  </nav>
+
+  <div class="toast" id="toast" role="status"></div>
+  <div class="viewer" id="viewer" hidden></div>
+</div>
+
+<script type="module" src="js/app.js"></script>
+</body>
+</html>
