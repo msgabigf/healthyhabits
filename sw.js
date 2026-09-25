@@ -1,6 +1,6 @@
 // Offline: the whole app is cached on install and served from the cache.
 // Bump VERSION on every deploy so phones pick up the new files.
-const VERSION = 'rotina-v1.1.0';
+const VERSION = 'rotina-v1.1.1';
 const FILES = [
   './',
   'index.html',
@@ -14,8 +14,8 @@ const FILES = [
   'assets/fonts/outfit-latin-wght-normal.woff2',
   'assets/art/sun.png', 'assets/art/moon.png', 'assets/art/apple.png',
   'assets/art/dumbbell.png', 'assets/art/heart.png',
-  'assets/icons/apple-touch-icon.png', 'assets/icons/favicon.png',
-  'assets/icons/icon-192.png', 'assets/icons/icon-512.png', 'assets/icons/icon-maskable-512.png',
+  'assets/icons/apple-touch-icon-g.png', 'assets/icons/favicon-g.png',
+  'assets/icons/icon-g-192.png', 'assets/icons/icon-g-512.png', 'assets/icons/icon-g-maskable-512.png',
 ];
 
 self.addEventListener('install', (e) => {
