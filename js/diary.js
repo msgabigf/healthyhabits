@@ -1,4 +1,4 @@
-import { checkins } from './store.js';
+import { checkins, kv } from './store.js';
 import { getConfig, CATEGORY_IDS } from './config.js';
 import { hasContent, normalizeRecord } from './data.js';
 import { $, esc, todayISO, iso, addDays, weekStart, parseISO, fmtShort, fmtDuration, minutesBetween, MONTHS, WEEKDAYS, weekday } from './util.js';
@@ -37,7 +37,7 @@ export async function renderDiary() {
   renderTally(byDate, today);
   renderCalendar(byDate, today);
   renderCharts(byDate, today);
-  renderRecent(all);
+  renderRecent(all, (await kv.get('health')) || {});
   $('#diarioSub').textContent = all.length
     ? `${all.length} ${all.length === 1 ? 'dia registrado' : 'dias registrados'}`
     : 'seus dias vão aparecendo aqui';
@@ -192,7 +192,7 @@ function wireTooltip(el, days, x, text) {
   svg.addEventListener('pointerleave', hide);
 }
 
-function renderRecent(all) {
+function renderRecent(all, health) {
   const cfg = getConfig();
   const recent = [...all].sort((a, b) => (a.date < b.date ? 1 : -1)).slice(0, 10);
   if (!recent.length) {
@@ -208,6 +208,8 @@ function renderRecent(all) {
     if (sm != null) meta.push(`dormiu ${fmtDuration(sm)}`);
     if (r.energy) meta.push(`energia ${r.energy}`);
     if (r.foodTag) meta.push({ 'consistente': 'comida no plano', 'mais-ou-menos': 'comida mais ou menos', 'fugiu': 'comida fugiu do plano' }[r.foodTag] || '');
+    const h = health[r.date];
+    if (h && h.kcal != null) meta.push(`${Math.round(h.kcal).toLocaleString('pt-BR')} kcal`);
     if (r.files.length) meta.push(`${r.files.length} anexo${r.files.length > 1 ? 's' : ''}`);
     if (r.movNote) meta.push(`“${esc(r.movNote)}”`);
     return `<button type="button" class="day-row" data-date="${r.date}">

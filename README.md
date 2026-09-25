@@ -48,6 +48,14 @@ This gives you automatic backup, lets you open your data in Sheets, and lets Cla
 
 The **Checkins** tab gets one readable row per day (activities, energy, sleep hours, food, links to attachments). The **Config** tab holds your plan and activity list.
 
+## 3b. Lifesum → Apple Health → Rotina (optional)
+
+An iPhone Shortcut reads the day's calories, protein, carbs, fat and water from Apple Health (where Lifesum writes them) and sends them to a **Saúde** tab in your Sheet every night. The app shows them in the **comida** section. Step-by-step guide (in Portuguese): [`docs/atalho-saude.md`](docs/atalho-saude.md).
+
+Any watch whose iPhone app writes to Apple Health can later feed sleep and workouts through the same route.
+
+**Updating the script:** when `apps-script/Code.gs` changes, paste the new version into Apps Script, save, then **Deploy → Manage deployments → ✏️ → Version: New version → Deploy** (the URL stays the same). Run `setup` again if new tabs were added.
+
 ## 4. Your plan and activities
 
 Set these in the app under **⚙ Ajustes**: weekly plan, activities per category, and weekly targets. Or paste a ready-made config under **backup → colar configuração**. They sync to the Sheet like everything else.

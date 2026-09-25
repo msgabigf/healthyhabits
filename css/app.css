@@ -261,6 +261,15 @@ input:focus, select:focus, textarea:focus { border-color: var(--ink-3); }
 .food-opt.on .flesh { fill: #E8705C; }
 .food-opt:active { transform: scale(.96); }
 
+.nutri { margin-top: 14px; padding: 12px 14px 14px; border: 1.5px dashed var(--rule); border-radius: 14px; }
+.nutri-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: 11.5px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); }
+.nutri-refresh { border: 0; background: var(--paper-2); color: var(--ink); border-radius: 8px; padding: 6px 10px; font-size: 12.5px; font-weight: 600; letter-spacing: 0; text-transform: none; }
+.nutri-kcal { margin-top: 4px; font-family: var(--display); font-size: 34px; font-weight: 600; line-height: 1.05; font-variation-settings: "SOFT" 100, "WONK" 1; }
+.nutri-kcal small { margin-left: 6px; font-size: 15px; font-weight: 400; font-style: italic; color: var(--ink-2); }
+.macros { display: flex; flex-wrap: wrap; gap: 6px 14px; margin-top: 8px; font-size: 14px; color: var(--ink-2); }
+.macro b { color: var(--ink); font-weight: 600; }
+.nutri-empty { margin: 6px 0 0; font-family: var(--display); font-style: italic; font-size: 15px; color: var(--ink-3); }
+
 .polaroids { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 16px; padding: 4px 2px; }
 .polaroid {
   position: relative; width: 92px; padding: 6px 6px 22px; background: #fff; border: 0;

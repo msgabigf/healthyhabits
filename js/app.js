@@ -1,16 +1,16 @@
 import { requestPersistence, checkins, kv } from './store.js';
 import { loadConfig, getConfig, onConfigChange, CATEGORY_IDS } from './config.js';
-import { loadSyncSettings, onSyncStatus, syncNow, isConfigured, pullIsStale } from './sync.js';
+import { loadSyncSettings, onSyncStatus, onHealthChange, syncNow, isConfigured, pullIsStale } from './sync.js';
 import { state, openDay, reloadDay, flush, checkRollover, onDayChange } from './state.js';
 import { onRecordsChange, normalizeRecord, hasContent } from './data.js';
-import { initToday, renderToday, renderPlan } from './today.js';
+import { initToday, renderToday, renderPlan, renderNutrition } from './today.js';
 import { initSleep, renderSleep } from './sleep.js';
 import { initDiary, renderDiary } from './diary.js';
 import { initSettings, renderSettings, applyTheme } from './settings.js';
 import { daysSinceBackup, exportBackup } from './backup.js';
 import { $, $$, todayISO, addDays, weekStart, fmtLong, parseISO, WEEKDAYS, WEEKDAYS_SHORT, toast } from './util.js';
 
-const VERSION = '1.0.0';
+const VERSION = '1.1.0';
 const DAY_PANELS = ['hoje', 'sono'];
 let current = 'hoje';
 const scrollPos = {};
@@ -92,6 +92,7 @@ async function boot() {
   initSettings({ onImported: async () => { await reloadDay(); renderDay(); if (current === 'diario') renderDiary(); } });
 
   onDayChange(renderDay);
+  onHealthChange(() => { renderNutrition(); if (current === 'diario') renderDiary(); });
   onRecordsChange(() => renderHeader());
   onConfigChange(() => { renderPlan(); renderHeader(); if (current === 'hoje') renderToday(); });
   onSyncStatus((s) => {

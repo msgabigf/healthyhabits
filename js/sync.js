@@ -14,6 +14,10 @@ let running = false;
 let again = false;
 const listeners = new Set();
 
+const healthListeners = new Set();
+export function onHealthChange(fn) { healthListeners.add(fn); }
+export async function getHealth(date) { return ((await kv.get('health')) || {})[date] || null; }
+
 export function onSyncStatus(fn) { listeners.add(fn); fn(status, lastError); }
 function setStatus(s, err = '') { status = s; lastError = err; listeners.forEach(fn => fn(s, err)); }
 
@@ -104,6 +108,12 @@ export async function pull() {
     await checkins.put({ ...normalizeRecord(remote), dirty: false });
     changedDates.push(remote.date);
   }
+  if (Array.isArray(r.health)) {
+    const map = {};
+    r.health.forEach(h => { if (h && /^\d{4}-\d{2}-\d{2}$/.test(h.date)) map[h.date] = h; });
+    await kv.set('health', map);
+    healthListeners.forEach(fn => fn(map));
+  }
   const cfg = getConfig();
   if (r.config && (!cfg.updatedAt || (r.config.updatedAt && r.config.updatedAt > cfg.updatedAt)) && !(await kv.get('configDirty'))) {
     await saveConfig(r.config, { fromRemote: true });
@@ -140,7 +150,11 @@ export async function syncNow({ withPull = false } = {}) {
 export const scheduleSync = debounce(() => syncNow(), 1500);
 
 // pull at most every 10 minutes when coming back to the app
+// (or right away after we sent the user to run the Health shortcut)
+let pullOnReturn = false;
+export function requestPullOnReturn() { pullOnReturn = true; }
 export function pullIsStale() {
+  if (pullOnReturn) { pullOnReturn = false; return true; }
   return !settings.lastPull || Date.now() - Date.parse(settings.lastPull) > 10 * 60 * 1000;
 }
 

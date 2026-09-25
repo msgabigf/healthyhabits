@@ -1,7 +1,10 @@
 import { state, update, flush, replaceRecord } from './state.js';
 import { getConfig, saveConfig, CATEGORY_IDS } from './config.js';
 import { attachFiles, removeFile, fileBlob } from './data.js';
+import { getHealth, isConfigured, requestPullOnReturn } from './sync.js';
 import { $, esc, toast, weekday } from './util.js';
+
+export const HEALTH_SHORTCUT = 'Rotina Saúde';
 
 const CHECK = '<svg class="check" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3.2 3L13 4.5"/></svg>';
 const ENERGY_WORDS = ['', 'zerada', 'baixa', 'ok', 'boa', 'a mil'];
@@ -84,6 +87,13 @@ export function initToday() {
     renderFood();
   });
 
+  $('#nutrition').addEventListener('click', (e) => {
+    if (!e.target.closest('[data-run-shortcut]')) return;
+    // opens the Shortcuts app; when you come back, the app pulls the new numbers
+    requestPullOnReturn();
+    location.href = 'shortcuts://run-shortcut?name=' + encodeURIComponent(HEALTH_SHORTCUT);
+  });
+
   $('#attachments').addEventListener('click', async (e) => {
     const x = e.target.closest('.x');
     if (x) {
@@ -121,6 +131,7 @@ export function renderToday() {
   $('#movNote').value = state.rec.movNote || '';
   renderEnergy();
   renderFood();
+  renderNutrition();
   renderFiles();
 }
 
@@ -175,6 +186,29 @@ function renderFood() {
     b.classList.toggle('on', on);
     b.setAttribute('aria-checked', String(on));
   });
+}
+
+const fmtNum = (n, d = 0) => Number(n).toLocaleString('pt-BR', { maximumFractionDigits: d });
+
+export async function renderNutrition() {
+  const el = $('#nutrition');
+  const date = state.date;
+  const h = await getHealth(date);
+  if (date !== state.date) return; // day changed while loading
+  const has = h && ['kcal', 'protein', 'carbs', 'fat', 'water'].some(k => h[k] != null);
+  if (!has && !isConfigured()) { el.hidden = true; return; }
+  el.hidden = false;
+  const refresh = state.followsToday && isConfigured()
+    ? '<button type="button" class="nutri-refresh" data-run-shortcut>atualizar</button>' : '';
+  if (!has) {
+    el.innerHTML = `<div class="nutri-head"><span>Lifesum · Apple Saúde</span>${refresh}</div>
+      <p class="nutri-empty">sem números pra esse dia</p>`;
+    return;
+  }
+  const macro = (label, v) => v == null ? '' : `<span class="macro"><b>${fmtNum(v)}</b> g ${label}</span>`;
+  el.innerHTML = `<div class="nutri-head"><span>Lifesum · Apple Saúde</span>${refresh}</div>
+    <div class="nutri-kcal">${h.kcal != null ? `${fmtNum(h.kcal)}<small>kcal</small>` : '—'}</div>
+    <div class="macros">${macro('proteína', h.protein)}${macro('carbo', h.carbs)}${macro('gordura', h.fat)}${h.water != null ? `<span class="macro"><b>${fmtNum(h.water / 1000, 1)}</b> L água</span>` : ''}</div>`;
 }
 
 async function renderFiles() {
