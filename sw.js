@@ -1,6 +1,6 @@
 // Offline: the whole app is cached on install and served from the cache.
 // Bump VERSION on every deploy so phones pick up the new files.
-const VERSION = 'rotina-v1.1.1';
+const VERSION = 'rotina-v1.1.2';
 const FILES = [
   './',
   'index.html',
@@ -39,8 +39,21 @@ self.addEventListener('fetch', (e) => {
   if (req.method !== 'GET') return;
   const url = new URL(req.url);
   if (url.origin !== location.origin) return; // Google Sheet sync etc. go straight to the network
+  // The page itself: always try the network first (so a new version and a new
+  // icon show up right away), fall back to the cached copy when offline.
   if (req.mode === 'navigate') {
-    e.respondWith(caches.match('index.html').then(r => r || fetch(req)));
+    e.respondWith((async () => {
+      try {
+        const ctrl = new AbortController();
+        const timer = setTimeout(() => ctrl.abort(), 3000);
+        const res = await fetch(req, { signal: ctrl.signal, cache: 'no-store' });
+        clearTimeout(timer);
+        if (res.ok) (await caches.open(VERSION)).put('index.html', res.clone());
+        return res;
+      } catch (err) {
+        return (await caches.match('index.html')) || Response.error();
+      }
+    })());
     return;
   }
   e.respondWith(caches.match(req, { ignoreSearch: true }).then(r => r || fetch(req)));
