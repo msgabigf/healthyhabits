@@ -1,6 +1,6 @@
 // Offline: the whole app is cached on install and served from the cache.
 // Bump VERSION on every deploy so phones pick up the new files.
-const VERSION = 'rotina-v1.1.0';
+const VERSION = 'rotina-v1.1.1';
 const FILES = [
   './',
   'index.html',

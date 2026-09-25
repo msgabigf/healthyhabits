@@ -10,7 +10,7 @@ import { initSettings, renderSettings, applyTheme } from './settings.js';
 import { daysSinceBackup, exportBackup } from './backup.js';
 import { $, $$, todayISO, addDays, weekStart, fmtLong, parseISO, WEEKDAYS, WEEKDAYS_SHORT, toast } from './util.js';
 
-const VERSION = '1.1.0';
+const VERSION = '1.1.1';
 const DAY_PANELS = ['hoje', 'sono'];
 let current = 'hoje';
 const scrollPos = {};
