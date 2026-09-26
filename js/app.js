@@ -10,9 +10,10 @@ import { initSettings, renderSettings, applyTheme } from './settings.js';
 import { daysSinceBackup, exportBackup } from './backup.js';
 import { $, $$, todayISO, addDays, weekStart, fmtLong, parseISO, WEEKDAYS, WEEKDAYS_SHORT, toast } from './util.js';
 
-const VERSION = '1.1.2';
+const VERSION = '1.1.3';
 const DAY_PANELS = ['hoje', 'sono'];
 let current = 'hoje';
+let dayStale = false; // settings changed while Hoje/Sono weren't on screen
 const scrollPos = {};
 
 // ---------- tabs ----------
@@ -27,6 +28,7 @@ function show(panel, { keepScroll = true } = {}) {
     if (on) t.setAttribute('aria-current', 'page'); else t.removeAttribute('aria-current');
   });
   $('#dayhead').hidden = !DAY_PANELS.includes(panel);
+  if (DAY_PANELS.includes(panel) && dayStale) { dayStale = false; renderToday(); renderSleep(); }
   if (panel === 'diario') renderDiary();
   if (panel === 'ajustes') renderSettings();
   window.scrollTo(0, keepScroll ? (scrollPos[panel] || 0) : 0);
@@ -94,7 +96,7 @@ async function boot() {
   onDayChange(renderDay);
   onHealthChange(() => { renderNutrition(); if (current === 'diario') renderDiary(); });
   onRecordsChange(() => renderHeader());
-  onConfigChange(() => { renderPlan(); renderHeader(); if (current === 'hoje') renderToday(); });
+  onConfigChange(() => { renderPlan(); renderHeader(); if (current === 'hoje') renderToday(); else dayStale = true; });
   onSyncStatus((s) => {
     const pill = $('#syncPill');
     pill.dataset.s = s;
